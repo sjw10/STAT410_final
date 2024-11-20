@@ -1,0 +1,39 @@
+```{r}
+cat("\014")
+rm(list=ls())
+setwd("C:/Users/wwang/Downloads")
+
+library(readxl)
+library(stargazer)
+library(faraway)
+library(car)
+library(leaps)
+library(ggplot2)
+library(dplyr)
+
+# read in the data
+Data = read_xlsx("2021WorldBank.xlsx", sheet = "Cleaned")
+
+# remove all missing values by replacing zero values with NA
+Data[Data == 0] = NA
+cleanedData = na.omit(Data)
+
+# condensing column names
+colnames(cleanedData) = c("Country", "ACFT", "AE", "CO2", "EducationYears", "HealthSpendGDP", "HealthSpendPPP", "EducationAttainment", "Fertility", "GDPperCapitaUSD", "GDPperCapitaPPP", "Diptheria", "HepB3", "Measles", "LifeExpectancy", "Status")
+
+# remove the country name column from the data as we don't want it in the regressions
+pureData = subset(cleanedData, select = -Country)
+pureData
+```
+
+```{r}
+library(tidyr)
+library(ggplot2)
+
+pureData %>%
+  gather(-LifeExpectancy, key = "var", value = "value") %>% 
+  ggplot(aes(x = value, y = LifeExpectancy)) +
+    geom_point() +
+    facet_wrap(~ var, scales = "free") +
+    theme_bw()
+```
